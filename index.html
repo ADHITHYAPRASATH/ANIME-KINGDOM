@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Anime Kingdom</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a12;color:#f0eaff;font-family:'Segoe UI',sans-serif;min-height:100vh}
+a{text-decoration:none;color:inherit}
+nav{position:sticky;top:0;z-index:100;background:rgba(10,10,18,0.95);backdrop-filter:blur(8px);border-bottom:1px solid #2a1f4a;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;height:60px}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#7c3aed,#c026d3);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.logo-text{font-size:1.3rem;font-weight:700;background:linear-gradient(90deg,#a78bfa,#e879f9);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.logo-sub{font-size:0.65rem;color:#7c3aed;letter-spacing:2px;font-weight:600;margin-top:-4px}
+.nav-links{display:flex;gap:1.5rem;align-items:center}
+.nav-links span{font-size:0.9rem;color:#c4b5fd;cursor:pointer;transition:color 0.2s}
+.nav-links span:hover,.nav-links span.active{color:#e879f9}
+.nav-right{display:flex;align-items:center;gap:12px}
+.nav-search{display:flex;align-items:center;background:#16102a;border:1px solid #3b2a6e;border-radius:20px;padding:6px 14px;gap:8px}
+.nav-search input{background:none;border:none;outline:none;color:#f0eaff;font-size:0.85rem;width:140px}
+.nav-search input::placeholder{color:#5b4b8a}
+.admin-btn{background:rgba(124,58,237,0.2);border:1px solid #4c1d95;color:#c4b5fd;padding:6px 14px;border-radius:16px;font-size:0.78rem;cursor:pointer;transition:all 0.2s}
+.admin-btn:hover{background:#7c3aed;color:#fff}
+.hero{position:relative;height:480px;overflow:hidden;display:flex;align-items:flex-end;padding:3rem}
+.hero-bg{position:absolute;inset:0;background:linear-gradient(135deg,#1a0533 0%,#0d0622 40%,#0a0a18 100%)}
+.hero-art{position:absolute;right:0;top:0;width:55%;height:100%;background:linear-gradient(to left,rgba(124,58,237,0.15),transparent)}
+.hero-glow{position:absolute;right:15%;top:20%;width:300px;height:300px;background:radial-gradient(circle,rgba(192,38,211,0.2) 0%,transparent 70%);border-radius:50%}
+.hero-badge{background:#7c3aed;color:#fff;font-size:0.7rem;padding:4px 12px;border-radius:20px;letter-spacing:1px;font-weight:600;display:inline-block;margin-bottom:12px}
+.hero-title{font-size:2.6rem;font-weight:800;line-height:1.1;margin-bottom:10px;max-width:500px}
+.hero-title span{background:linear-gradient(90deg,#a78bfa,#e879f9);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero-desc{color:#b09fd4;font-size:0.95rem;max-width:420px;line-height:1.6;margin-bottom:1.5rem}
+.hero-btns{display:flex;gap:12px}
+.btn-primary{background:linear-gradient(135deg,#7c3aed,#c026d3);color:#fff;border:none;padding:11px 24px;border-radius:24px;font-weight:600;cursor:pointer;font-size:0.9rem;display:flex;align-items:center;gap:8px;transition:opacity 0.2s}
+.btn-primary:hover{opacity:0.85}
+.btn-secondary{background:rgba(124,58,237,0.15);color:#c4b5fd;border:1px solid #4c1d95;padding:11px 22px;border-radius:24px;font-weight:600;cursor:pointer;font-size:0.9rem;transition:background 0.2s}
+.btn-secondary:hover{background:rgba(124,58,237,0.25)}
+.hero-tags{display:flex;gap:8px;margin-top:1rem}
+.tag{background:rgba(124,58,237,0.2);border:1px solid #4c1d95;color:#c4b5fd;font-size:0.72rem;padding:3px 10px;border-radius:12px}
+section{padding:2rem}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem}
+.section-title{font-size:1.15rem;font-weight:700;display:flex;align-items:center;gap:10px}
+.section-title::before{content:'';width:4px;height:18px;background:linear-gradient(#7c3aed,#c026d3);border-radius:2px;display:block}
+.see-all{font-size:0.8rem;color:#7c3aed;cursor:pointer}
+.see-all:hover{color:#e879f9}
+.anime-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:16px}
+.anime-card{background:#16102a;border-radius:12px;overflow:hidden;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;border:1px solid #2a1f4a;position:relative}
+.anime-card:hover{transform:translateY(-4px);box-shadow:0 8px 30px rgba(124,58,237,0.3);border-color:#7c3aed}
+.anime-thumb-placeholder{width:100%;aspect-ratio:3/4;display:flex;align-items:center;justify-content:center;font-size:2.5rem;background:linear-gradient(135deg,#1e1535,#2d1b54)}
+.has-video::after{content:'▶';position:absolute;top:8px;right:8px;background:#7c3aed;color:#fff;font-size:0.6rem;padding:2px 6px;border-radius:8px}
+.anime-info{padding:8px 10px 10px}
+.anime-title{font-size:0.8rem;font-weight:600;line-height:1.3;margin-bottom:4px;color:#e9d5ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.anime-meta{font-size:0.7rem;color:#7c6faa;display:flex;justify-content:space-between}
+.anime-score{color:#e879f9;font-weight:700}
+.featured-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+.featured-card{background:#16102a;border-radius:14px;overflow:hidden;border:1px solid #2a1f4a;display:flex;gap:14px;padding:14px;cursor:pointer;transition:border-color 0.2s}
+.featured-card:hover{border-color:#7c3aed}
+.featured-thumb{width:80px;min-width:80px;aspect-ratio:3/4;border-radius:8px;background:linear-gradient(135deg,#2d1b54,#1e1535);display:flex;align-items:center;justify-content:center;font-size:2rem}
+.featured-info{flex:1;min-width:0}
+.featured-title{font-size:0.9rem;font-weight:700;margin-bottom:4px;color:#e9d5ff}
+.featured-genre{font-size:0.7rem;color:#7c3aed;margin-bottom:6px}
+.featured-desc{font-size:0.75rem;color:#9478c0;line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;overflow:hidden}
+.play-btn{margin-top:8px;background:#7c3aed;color:#fff;border:none;padding:5px 12px;border-radius:12px;font-size:0.72rem;cursor:pointer;font-weight:600}
+.genres{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1.5rem}
+.genre-chip{background:#16102a;border:1px solid #2a1f4a;color:#c4b5fd;padding:6px 16px;border-radius:20px;font-size:0.8rem;cursor:pointer;transition:all 0.2s}
+.genre-chip:hover,.genre-chip.active{background:#7c3aed;border-color:#7c3aed;color:#fff}
+
+/* PLAYER MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:200;align-items:center;justify-content:center;padding:1rem}
+.modal-overlay.open{display:flex}
+.modal-box{background:#100c20;border:1px solid #3b2a6e;border-radius:18px;width:100%;max-width:780px;overflow:hidden}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #2a1f4a}
+.modal-title{font-size:1rem;font-weight:700;color:#e9d5ff}
+.close-btn{background:rgba(124,58,237,0.2);border:none;color:#c4b5fd;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center}
+.close-btn:hover{background:#7c3aed;color:#fff}
+.player-wrap{background:#000;width:100%;aspect-ratio:16/9;position:relative}
+.player-wrap iframe{width:100%;height:100%;border:none;display:block}
+.player-placeholder{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#0d0a1a}
+.player-placeholder .big-emoji{font-size:4rem;opacity:0.3}
+.player-placeholder p{color:#5b4b8a;font-size:0.85rem;text-align:center;line-height:1.6}
+.player-placeholder button{background:#7c3aed;color:#fff;border:none;padding:8px 20px;border-radius:12px;font-size:0.8rem;cursor:pointer;font-weight:600}
+.player-info{padding:14px 18px}
+.player-anime-title{font-size:1.05rem;font-weight:700;margin-bottom:4px}
+.player-ep{font-size:0.8rem;color:#9478c0;margin-bottom:12px}
+.ep-list{display:flex;gap:8px;flex-wrap:wrap}
+.ep-pill{background:#1e1535;border:1px solid #3b2a6e;color:#c4b5fd;padding:5px 12px;border-radius:12px;font-size:0.75rem;cursor:pointer;transition:all 0.2s}
+.ep-pill.active,.ep-pill:hover{background:#7c3aed;border-color:#7c3aed;color:#fff}
+
+/* ADMIN PANEL */
+.admin-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:300;align-items:flex-start;justify-content:center;padding:2rem;overflow-y:auto}
+.admin-overlay.open{display:flex}
+.admin-box{background:#100c20;border:1px solid #7c3aed;border-radius:18px;width:100%;max-width:680px;padding:0;overflow:hidden}
+.admin-head{background:linear-gradient(135deg,#1e1535,#2d1b54);padding:18px 22px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #3b2a6e}
+.admin-head h2{font-size:1.1rem;font-weight:700;color:#e9d5ff}
+.admin-head p{font-size:0.75rem;color:#9478c0;margin-top:2px}
+.admin-body{padding:20px 22px;display:flex;flex-direction:column;gap:14px}
+.anime-row{background:#16102a;border:1px solid #2a1f4a;border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.anime-row-top{display:flex;align-items:center;gap:10px}
+.anime-emoji{font-size:1.5rem;width:36px;text-align:center}
+.anime-row-name{font-size:0.9rem;font-weight:600;color:#e9d5ff}
+.anime-row-genre{font-size:0.72rem;color:#7c3aed}
+.embed-input-wrap{display:flex;gap:8px;align-items:center}
+.embed-input{flex:1;background:#0a0a12;border:1px solid #3b2a6e;border-radius:10px;padding:8px 12px;color:#f0eaff;font-size:0.8rem;outline:none;transition:border-color 0.2s}
+.embed-input:focus{border-color:#7c3aed}
+.embed-input::placeholder{color:#4a3a6a}
+.save-btn{background:#7c3aed;color:#fff;border:none;padding:8px 14px;border-radius:10px;font-size:0.78rem;cursor:pointer;font-weight:600;white-space:nowrap;transition:opacity 0.2s}
+.save-btn:hover{opacity:0.85}
+.saved-indicator{font-size:0.72rem;color:#4ade80;display:none}
+.help-box{background:#0d0a1a;border:1px solid #2a1f4a;border-radius:10px;padding:12px 14px;font-size:0.78rem;color:#7c6faa;line-height:1.7}
+.help-box strong{color:#c4b5fd}
+.help-box code{background:#1e1535;padding:2px 6px;border-radius:4px;color:#e879f9;font-size:0.75rem}
+
+#search-results{display:none;padding:0 2rem 2rem}
+footer{border-top:1px solid #2a1f4a;padding:1.5rem 2rem;text-align:center;color:#5b4b8a;font-size:0.8rem}
+footer span{color:#7c3aed}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:#0a0a12}
+::-webkit-scrollbar-thumb{background:#3b2a6e;border-radius:3px}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">
+    <div class="logo-icon">👑</div>
+    <div>
+      <div class="logo-text">Anime Kingdom</div>
+      <div class="logo-sub">by Senpai Studio</div>
+    </div>
+  </div>
+  <div class="nav-links">
+    <span class="active" onclick="showHome()">Home</span>
+    <span onclick="showBrowse()">Browse</span>
+    <span>Trending</span>
+    <span>New</span>
+  </div>
+  <div class="nav-right">
+    <div class="nav-search">
+      <span style="color:#7c3aed;font-size:0.9rem">🔍</span>
+      <input type="text" id="searchInput" placeholder="Search anime..." oninput="onSearch(this.value)"/>
+    </div>
+    <button class="admin-btn" onclick="openAdmin()">⚙️ Admin</button>
+  </div>
+</nav>
+
+<div class="hero" id="heroSection">
+  <div class="hero-bg"></div><div class="hero-art"></div><div class="hero-glow"></div>
+  <div style="position:relative;z-index:2">
+    <div class="hero-badge">🔥 NOW STREAMING</div>
+    <h1 class="hero-title">Your <span>Anime Kingdom</span> Awaits</h1>
+    <p class="hero-desc">Stream thousands of anime series and movies. From classic shonen to romantic slice-of-life — all in one kingdom.</p>
+    <div class="hero-btns">
+      <button class="btn-primary" onclick="openPlayer(animeDB[0])">▶ Watch Now</button>
+      <button class="btn-secondary" onclick="showBrowse()">Browse All</button>
+    </div>
+    <div class="hero-tags">
+      <span class="tag">Action</span><span class="tag">Romance</span><span class="tag">Fantasy</span><span class="tag">Shounen</span>
+    </div>
+  </div>
+</div>
+
+<div id="homeContent">
+  <section>
+    <div class="section-header">
+      <div class="section-title">🔥 Trending Now</div>
+      <span class="see-all" onclick="showBrowse()">See all →</span>
+    </div>
+    <div class="anime-grid" id="trendingGrid"></div>
+  </section>
+  <section>
+    <div class="section-header">
+      <div class="section-title">⭐ Kingdom Picks</div>
+      <span class="see-all" onclick="showBrowse()">See all →</span>
+    </div>
+    <div class="featured-grid" id="featuredGrid"></div>
+  </section>
+  <section>
+    <div class="section-header">
+      <div class="section-title">🏆 Top Rated</div>
+      <span class="see-all" onclick="showBrowse()">See all →</span>
+    </div>
+    <div class="anime-grid" id="topRatedGrid"></div>
+  </section>
+</div>
+
+<div id="browseContent" style="display:none;padding:2rem">
+  <div class="section-title" style="margin-bottom:1.2rem">📺 Browse Anime</div>
+  <div class="genres" id="genreFilters"></div>
+  <div class="anime-grid" id="browseGrid"></div>
+</div>
+
+<div id="search-results">
+  <div class="section-title" style="margin-bottom:1rem">🔍 Search Results</div>
+  <div class="anime-grid" id="searchGrid"></div>
+</div>
+
+<!-- PLAYER MODAL -->
+<div class="modal-overlay" id="playerModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle"></div>
+      <button class="close-btn" onclick="closePlayer()">✕</button>
+    </div>
+    <div class="player-wrap" id="playerWrap"></div>
+    <div class="player-info">
+      <div class="player-anime-title" id="playerAnimeTitle"></div>
+      <div class="player-ep" id="playerEpLabel"></div>
+      <div class="ep-list" id="epList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div class="admin-overlay" id="adminPanel">
+  <div class="admin-box">
+    <div class="admin-head">
+      <div>
+        <h2>⚙️ Video Embed Manager</h2>
+        <p>Paste a YouTube embed URL for each anime to enable streaming</p>
+      </div>
+      <button class="close-btn" onclick="closeAdmin()">✕</button>
+    </div>
+    <div class="admin-body">
+
+      <!-- LOCK SCREEN -->
+      <div id="adminLock" style="display:flex;flex-direction:column;align-items:center;gap:16px;padding:2rem 0">
+        <div style="font-size:3rem">🔒</div>
+        <div style="font-size:1rem;font-weight:700;color:#e9d5ff">Admin Access</div>
+        <div style="font-size:0.8rem;color:#7c6faa">Enter your password to continue</div>
+        <input id="passInput" type="password" class="embed-input" placeholder="Enter password..." style="width:260px;text-align:center;font-size:1rem;letter-spacing:3px" onkeydown="if(event.key==='Enter')checkPass()"/>
+        <button class="save-btn" style="padding:10px 28px;font-size:0.9rem" onclick="checkPass()">🔓 Unlock</button>
+        <div id="passError" style="display:none;color:#f87171;font-size:0.8rem">❌ Wrong password. Try again.</div>
+      </div>
+
+      <!-- UNLOCKED CONTENT -->
+      <div id="adminUnlockedContent" style="display:none;display:flex;flex-direction:column;gap:14px">
+      <div class="help-box">
+        <strong>How to get a YouTube embed URL:</strong><br>
+        1. Open any YouTube video<br>
+        2. Click <strong>Share → Embed</strong><br>
+        3. Copy only the URL inside <code>src="..."</code> — it looks like:<br>
+        <code>https://www.youtube.com/embed/VIDEO_ID</code><br><br>
+        <strong>Tip:</strong> Search "<strong>anime name episode 1 official</strong>" on YouTube for free legal episodes from Muse Asia, Crunchyroll, etc.
+      </div>
+      <div id="adminRows"></div>
+      </div><!-- end unlocked -->
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>👑 <span>Anime Kingdom</span> — A Senpai Studio Original Experience</p>
+  <p style="margin-top:4px;font-size:0.72rem">Streaming anime straight to your screen • Built with ❤️ by Aurora Adhithya</p>
+</footer>
+
+<script>
+const animeDB = [
+  {id:1,title:"Jujutsu Kaisen",score:8.7,eps:24,genre:"Action",thumb:"🌀",desc:"Yuji Itadori swallows a cursed finger and becomes host to the most powerful curse — Ryomen Sukuna.",year:2020,trending:true,topRated:true},
+  {id:2,title:"Naruto",score:8.3,eps:220,genre:"Adventure",thumb:"🍥",desc:"A young ninja outcast seeks recognition and dreams of becoming Hokage — the leader of his village.",year:2002,trending:true,topRated:true},
+  {id:3,title:"Attack on Titan",score:9.0,eps:87,genre:"Dark Fantasy",thumb:"⚔️",desc:"Humanity lives inside cities surrounded by enormous walls due to the Titans.",year:2013,trending:true,topRated:true},
+  {id:4,title:"Demon Slayer",score:8.9,eps:44,genre:"Action",thumb:"🔥",desc:"Tanjiro becomes a demon slayer to avenge his family and cure his demon-turned sister.",year:2019,trending:true,topRated:false},
+  {id:5,title:"A Couple of Cuckoos",score:7.4,eps:24,genre:"Romance",thumb:"🐦",desc:"Two teens switched at birth must now live together as fake siblings-turned-fiancés.",year:2022,trending:true,topRated:false},
+  {id:6,title:"Spy x Family",score:8.5,eps:25,genre:"Comedy",thumb:"🕵️",desc:"A spy, an assassin, and a telepath pretend to be a family — each hiding their true identity.",year:2022,trending:false,topRated:true},
+  {id:7,title:"One Piece",score:8.8,eps:1000,genre:"Adventure",thumb:"☠️",desc:"Monkey D. Luffy sails the Grand Line in search of the ultimate treasure, the One Piece.",year:1999,trending:false,topRated:true},
+  {id:8,title:"My Hero Academia",score:8.0,eps:138,genre:"Action",thumb:"💥",desc:"A quirkless boy strives to become the greatest hero in a world where most people have superpowers.",year:2016,trending:true,topRated:false},
+  {id:9,title:"Your Lie in April",score:8.7,eps:22,genre:"Romance",thumb:"🎹",desc:"A pianist who lost his ability to hear music meets a violinist who reawakens his passion.",year:2014,trending:false,topRated:true},
+  {id:10,title:"Sword Art Online",score:7.5,eps:25,genre:"Sci-Fi",thumb:"🗡️",desc:"Players trapped in a VR game must clear all floors or die in real life.",year:2012,trending:false,topRated:false},
+  {id:11,title:"Re:Zero",score:8.4,eps:50,genre:"Fantasy",thumb:"❄️",desc:"Subaru Natsuki discovers he has the ability to revive from death in another world.",year:2016,trending:false,topRated:true},
+  {id:12,title:"Vinland Saga",score:8.8,eps:24,genre:"Historical",thumb:"🪓",desc:"Young Thorfinn seeks revenge against the Viking who killed his father.",year:2019,trending:true,topRated:true},
+];
+
+// Load saved embed URLs from localStorage
+const embedKey = id => `ak_embed_${id}`;
+const getEmbed = id => localStorage.getItem(embedKey(id)) || '';
+const setEmbed = (id, url) => localStorage.setItem(embedKey(id), url);
+
+const featured = animeDB.filter(a=>a.topRated).slice(0,4);
+const genres = [...new Set(animeDB.map(a=>a.genre))];
+
+function extractEmbedId(url){
+  // Accept full embed URL or just video ID or youtu.be links
+  url = url.trim();
+  let m;
+  m = url.match(/youtube\.com\/embed\/([^?&"]+)/);
+  if(m) return m[1];
+  m = url.match(/youtu\.be\/([^?&"]+)/);
+  if(m) return m[1];
+  m = url.match(/v=([^&"]+)/);
+  if(m) return m[1];
+  if(/^[A-Za-z0-9_-]{11}$/.test(url)) return url;
+  return null;
+}
+
+function makeCard(a){
+  const hasVid = !!getEmbed(a.id);
+  return `<div class="anime-card${hasVid?' has-video':''}" onclick="openPlayer(animeDB[${a.id-1}])">
+    <div class="anime-thumb-placeholder">${a.thumb}</div>
+    <div class="anime-info">
+      <div class="anime-title">${a.title}</div>
+      <div class="anime-meta"><span class="anime-score">★ ${a.score}</span><span style="color:#6d5f9a">${a.eps} eps</span></div>
+    </div>
+  </div>`;
+}
+
+function makeFeatured(a){
+  return `<div class="featured-card" onclick="openPlayer(animeDB[${a.id-1}])">
+    <div class="featured-thumb">${a.thumb}</div>
+    <div class="featured-info">
+      <div class="featured-title">${a.title}</div>
+      <div class="featured-genre">${a.genre} • ${a.year}</div>
+      <div class="featured-desc">${a.desc}</div>
+      <button class="play-btn" onclick="event.stopPropagation();openPlayer(animeDB[${a.id-1}])">▶ Play</button>
+    </div>
+  </div>`;
+}
+
+function renderAll(){
+  document.getElementById('trendingGrid').innerHTML = animeDB.filter(a=>a.trending).map(makeCard).join('');
+  document.getElementById('featuredGrid').innerHTML = featured.map(makeFeatured).join('');
+  document.getElementById('topRatedGrid').innerHTML = animeDB.filter(a=>a.topRated).map(makeCard).join('');
+  document.getElementById('browseGrid').innerHTML = animeDB.map(makeCard).join('');
+}
+renderAll();
+
+document.getElementById('genreFilters').innerHTML =
+  `<span class="genre-chip active" onclick="filterGenre('All',this)">All</span>` +
+  genres.map(g=>`<span class="genre-chip" onclick="filterGenre('${g}',this)">${g}</span>`).join('');
+
+function filterGenre(g,el){
+  document.querySelectorAll('.genre-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  const list = g==='All' ? animeDB : animeDB.filter(a=>a.genre===g);
+  document.getElementById('browseGrid').innerHTML = list.map(makeCard).join('');
+}
+
+function showHome(){
+  document.getElementById('homeContent').style.display='block';
+  document.getElementById('heroSection').style.display='flex';
+  document.getElementById('browseContent').style.display='none';
+  document.getElementById('search-results').style.display='none';
+  document.querySelectorAll('.nav-links span').forEach((s,i)=>s.classList.toggle('active',i===0));
+}
+function showBrowse(){
+  document.getElementById('homeContent').style.display='none';
+  document.getElementById('heroSection').style.display='none';
+  document.getElementById('browseContent').style.display='block';
+  document.getElementById('search-results').style.display='none';
+  document.querySelectorAll('.nav-links span').forEach((s,i)=>s.classList.toggle('active',i===1));
+}
+function onSearch(q){
+  if(!q.trim()){showHome();return}
+  document.getElementById('homeContent').style.display='none';
+  document.getElementById('heroSection').style.display='none';
+  document.getElementById('browseContent').style.display='none';
+  document.getElementById('search-results').style.display='block';
+  const r = animeDB.filter(a=>a.title.toLowerCase().includes(q.toLowerCase())||a.genre.toLowerCase().includes(q.toLowerCase()));
+  document.getElementById('searchGrid').innerHTML = r.length ? r.map(makeCard).join('') :
+    `<p style="color:#7c6faa;grid-column:1/-1;padding:1rem 0">No results for "<strong>${q}</strong>"</p>`;
+}
+
+// PLAYER
+function openPlayer(a){
+  const embedUrl = getEmbed(a.id);
+  const vid = embedUrl ? extractEmbedId(embedUrl) : null;
+  document.getElementById('modalTitle').textContent = a.title;
+  document.getElementById('playerAnimeTitle').textContent = a.title;
+  document.getElementById('playerEpLabel').textContent = `${a.genre} • ${a.year} • ${a.eps} Episodes`;
+  const epCount = Math.min(a.eps, 12);
+  document.getElementById('epList').innerHTML = Array.from({length:epCount},(_,i)=>
+    `<span class="ep-pill${i===0?' active':''}" onclick="selectEp(this,${i+1},'${vid||''}')">Ep ${i+1}</span>`
+  ).join('');
+  if(vid){
+    document.getElementById('playerWrap').innerHTML =
+      `<iframe src="https://www.youtube.com/embed/${vid}?autoplay=1&rel=0" allowfullscreen allow="autoplay"></iframe>`;
+  } else {
+    document.getElementById('playerWrap').innerHTML = `
+      <div class="player-placeholder">
+        <div class="big-emoji">${a.thumb}</div>
+        <p>No video linked yet for <strong>${a.title}</strong>.<br>Go to <strong>⚙️ Admin</strong> and paste a YouTube embed URL.</p>
+        <button onclick="closePlayer();openAdmin()">⚙️ Add Video</button>
+      </div>`;
+  }
+  document.getElementById('playerModal').classList.add('open');
+}
+
+function selectEp(el, ep, vid){
+  document.querySelectorAll('.ep-pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('playerEpLabel').textContent = `Episode ${ep} — Now Playing`;
+  if(vid){
+    document.getElementById('playerWrap').innerHTML =
+      `<iframe src="https://www.youtube.com/embed/${vid}?autoplay=1&rel=0" allowfullscreen allow="autoplay"></iframe>`;
+  }
+}
+
+function closePlayer(){
+  document.getElementById('playerModal').classList.remove('open');
+  document.getElementById('playerWrap').innerHTML='';
+}
+
+// ADMIN PASSWORD
+const ADMIN_PASS = "senpai2027";
+let adminUnlocked = false;
+
+function openAdmin(){
+  if(!adminUnlocked){
+    showPassPrompt();
+    return;
+  }
+  renderAdminPanel();
+}
+
+function showPassPrompt(){
+  document.getElementById('adminPanel').classList.add('open');
+  document.getElementById('adminRows').innerHTML = '';
+  document.getElementById('adminLock').style.display='flex';
+  document.getElementById('adminUnlockedContent').style.display='none';
+  setTimeout(()=>document.getElementById('passInput').focus(),100);
+}
+
+function checkPass(){
+  const val = document.getElementById('passInput').value;
+  if(val === ADMIN_PASS){
+    adminUnlocked = true;
+    document.getElementById('adminLock').style.display='none';
+    document.getElementById('adminUnlockedContent').style.display='block';
+    renderAdminRows();
+  } else {
+    document.getElementById('passError').style.display='block';
+    document.getElementById('passInput').value='';
+    document.getElementById('passInput').focus();
+    setTimeout(()=>document.getElementById('passError').style.display='none',2000);
+  }
+}
+
+function renderAdminRows(){
+  document.getElementById('adminRows').innerHTML = animeDB.map(a => {
+    const saved = getEmbed(a.id);
+    return `<div class="anime-row" id="row_${a.id}">
+      <div class="anime-row-top">
+        <div class="anime-emoji">${a.thumb}</div>
+        <div><div class="anime-row-name">${a.title}</div><div class="anime-row-genre">${a.genre} • ${a.year}</div></div>
+      </div>
+      <div class="embed-input-wrap">
+        <input class="embed-input" id="input_${a.id}" placeholder="https://www.youtube.com/embed/VIDEO_ID" value="${saved}"/>
+        <button class="save-btn" onclick="saveEmbed(${a.id})">Save</button>
+      </div>
+      <span class="saved-indicator" id="saved_${a.id}">✓ Saved!</span>
+    </div>`;
+  }).join('');
+}
+
+function renderAdminPanel(){
+  document.getElementById('adminPanel').classList.add('open');
+  document.getElementById('adminLock').style.display='none';
+  document.getElementById('adminUnlockedContent').style.display='block';
+  renderAdminRows();
+}
+
+function saveEmbed(id){
+  const raw = document.getElementById(`input_${id}`).value.trim();
+  const vid = raw ? extractEmbedId(raw) : null;
+  const finalUrl = vid ? `https://www.youtube.com/embed/${vid}` : '';
+  setEmbed(id, finalUrl);
+  if(raw && !vid){
+    document.getElementById(`saved_${id}`).textContent = '⚠️ Invalid URL — check and retry';
+  } else {
+    document.getElementById(`saved_${id}`).textContent = finalUrl ? '✓ Saved!' : '✓ Cleared';
+  }
+  document.getElementById(`saved_${id}`).style.display='block';
+  setTimeout(()=>document.getElementById(`saved_${id}`).style.display='none', 2500);
+  renderAll();
+}
+
+function closeAdmin(){
+  document.getElementById('adminPanel').classList.remove('open');
+}
+</script>
+</body>
+</html>
